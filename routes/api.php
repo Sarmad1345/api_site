@@ -16,3 +16,4 @@ Route::get("/test", function () {
 });
 
 Route::get("blogs", [BlogController::class, "getBlogs"]);
+Route::post("addBlog", [BlogController::class, "addBlogs"]);
