@@ -14,6 +14,11 @@ class BlogController extends Controller
 
     function addBlogs(Request $request)
     {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
         $blogs = new Blog();
         $blogs->title = $request->title;
         $blogs->content = $request->content;
