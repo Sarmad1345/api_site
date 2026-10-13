@@ -16,6 +16,7 @@ Route::get("/test", function () {
 });
 
 Route::get("blogs", [BlogController::class, "getBlogs"]);
+Route::get("blog/{id}", [BlogController::class, "getBlog"]);
 Route::post("addBlog", [BlogController::class, "addBlogs"]);
 Route::put("updateBlog", [BlogController::class, "updateBlogs"]);
 Route::delete("deleteBlog/{id}", [BlogController::class, "deleteBlog"]);
