@@ -79,4 +79,40 @@ class BlogController extends Controller
             return ["result" => "Data not Deleted"];
         }
     }
+    function searchBlogs()
+    {
+        $searchTerm = request('search');
+        return Blog::with(['category', 'tags', 'image'])
+            ->where(function ($query) use ($searchTerm) {
+                $query->where('title', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('description', 'like', '%' . $searchTerm . '%');
+            })
+            ->latest()
+            ->paginate(10);
+    }
+
+    function trashedBlogs()
+    {
+        return Blog::onlyTrashed()->latest('deleted_at')->get();
+    }
+
+    function restoreBlog(int $id)
+    {
+        $blog = Blog::onlyTrashed()->find($id);
+        if (!$blog) {
+            return response()->json(["result" => "Blog not found in trash"], 404);
+        }
+        $blog->restore();
+        return ["result" => "Blog restored"];
+    }
+
+    function forceDeleteBlog(int $id)
+    {
+        $blog = Blog::withTrashed()->find($id);
+        if (!$blog) {
+            return response()->json(["result" => "Blog not found"], 404);
+        }
+        $blog->forceDelete();
+        return ["result" => "Blog permanently deleted"];
+    }
 }

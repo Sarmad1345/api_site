@@ -22,6 +22,10 @@ Route::get("blog/{id}", [BlogController::class, "getBlog"]);
 Route::post("addBlog", [BlogController::class, "addBlogs"]);
 Route::put("updateBlog", [BlogController::class, "updateBlogs"]);
 Route::delete("deleteBlog/{id}", [BlogController::class, "deleteBlog"]);
+Route::get("searchBlogs", [BlogController::class, "searchBlogs"]);
+Route::get("trashedBlogs", [BlogController::class, "trashedBlogs"]);
+Route::patch("restoreBlog/{id}", [BlogController::class, "restoreBlog"]);
+Route::delete("forceDeleteBlog/{id}", [BlogController::class, "forceDeleteBlog"]);
 
 Route::get("categories", [CategoryController::class, "getCategories"]);
 Route::get("tags", [TagController::class, "getTags"]);
