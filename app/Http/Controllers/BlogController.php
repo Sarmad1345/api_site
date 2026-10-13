@@ -12,6 +12,15 @@ class BlogController extends Controller
         return Blog::all();
     }
 
+    function getBlog(int $id)
+    {
+        $blog = Blog::find($id);
+        if (!$blog) {
+            return response()->json(["result" => "Blog not found"], 404);
+        }
+        return $blog;
+    }
+
     function addBlogs(Request $request)
     {
         $request->validate([
