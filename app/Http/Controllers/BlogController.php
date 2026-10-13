@@ -2,55 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\BlogRequest;
 use App\Models\Blog;
+use App\Models\Image;
 
 class BlogController extends Controller
 {
     function getBlogs()
     {
-        return Blog::all();
+        return Blog::with(['category', 'tags', 'image'])->latest('updated_at')->paginate(10);
     }
 
     function getBlog(int $id)
     {
-        $blog = Blog::find($id);
+        $blog = Blog::with(['category', 'tags', 'image'])->find($id);
         if (!$blog) {
             return response()->json(["result" => "Blog not found"], 404);
         }
         return $blog;
     }
 
-    function addBlogs(Request $request)
+    function addBlogs(BlogRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
+        $path = $request->file('file')->store('images', 'public');
+        $image = Image::create([
+            "path" => $path,
         ]);
 
-        $blogs = new Blog();
-        $blogs->title = $request->title;
-        $blogs->content = $request->content;
-        if ($blogs->save()) {
-            return ["result" => "Data has been saved", "blog" => $blogs];
-        } else {
-            return ["result" => "Data not saved"];
-        }
+        $blog = Blog::create([
+            "email" => $request->email,
+            "title" => $request->title,
+            "description" => $request->description,
+            "image_id" => $image->id,
+            "category_id" => $request->category_id,
+        ]);
+        $blog->tags()->attach($request->tags ?? []);
+
+        return ["result" => "Data has been saved", "blog" => $blog->load(['category', 'tags', 'image'])];
     }
 
-    function updateBlogs(Request $request)
+    function updateBlogs(BlogRequest $request)
     {
-        $blogs = Blog::find($request->id);
-        if (!$blogs) {
+        $blog = Blog::find($request->id);
+        if (!$blog) {
             return response()->json(["result" => "Blog not found"], 404);
         }
-        $blogs->title = $request->title;
-        $blogs->content = $request->content;
-        if ($blogs->save()) {
-            return ["result" => "Data has been updated"];
-        } else {
-            return ["result" => "Data not updated"];
+
+        $data = [
+            "email" => $request->email,
+            "title" => $request->title,
+            "description" => $request->description,
+            "category_id" => $request->category_id,
+        ];
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('images', 'public');
+            $data["image_id"] = Image::create(["path" => $path])->id;
         }
+
+        $blog->update($data);
+        if ($request->has('tags')) {
+            $blog->tags()->sync($request->tags ?? []);
+        }
+
+        return ["result" => "Data has been updated", "blog" => $blog->load(['category', 'tags', 'image'])];
     }
 
     function deleteBlog(int $id)
