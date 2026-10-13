@@ -55,6 +55,9 @@ class BlogController extends Controller
 
     function deleteBlog(int $id)
     {
+        if (!Blog::find($id)) {
+            return response()->json(["result" => "Blog not found"], 404);
+        }
         $data = Blog::destroy($id);
         if ($data) {
             return ["result" => "data has been deleted"];
