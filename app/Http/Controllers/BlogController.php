@@ -32,7 +32,7 @@ class BlogController extends Controller
         $blogs->title = $request->title;
         $blogs->content = $request->content;
         if ($blogs->save()) {
-            return ["result" => "Data has been saved"];
+            return ["result" => "Data has been saved", "blog" => $blogs];
         } else {
             return ["result" => "Data not saved"];
         }
