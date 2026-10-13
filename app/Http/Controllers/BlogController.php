@@ -32,6 +32,9 @@ class BlogController extends Controller
     function updateBlogs(Request $request)
     {
         $blogs = Blog::find($request->id);
+        if (!$blogs) {
+            return response()->json(["result" => "Blog not found"], 404);
+        }
         $blogs->title = $request->title;
         $blogs->content = $request->content;
         if ($blogs->save()) {
