@@ -35,7 +35,8 @@ class BlogController extends Controller
             return ["result" => "Data not updated"];
         }
     }
-    function deleteBlog($id)
+
+    function deleteBlog(int $id)
     {
         $data = Blog::destroy($id);
         if ($data) {
